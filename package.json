@@ -2,20 +2,26 @@
   "name": "pr-analyze-bot",
   "version": "0.0.1",
   "description": "Analyze Pull Request",
-  "author": "Yuki Ueda",
+  "author": "ikuyadeu",
   "repository": "https://github.com/Ikuyadeu/PR-AnalyzeBot",
   "scripts": {
-    "start": "probot run ./index.js"
+    "start": "probot run ./index.js",
+    "test": "mocha && xo --extend probot"
   },
   "dependencies": {
-    "probot": "^0.6.0"
+    "js-yaml": "^3.8.4",
+    "probot": "~0.6.0",
+    "probot-visitor": "^0.2.0"
   },
   "engines": {
-    "node": "^7.9",
-    "npm": "^5.0"
+    "node": ">= 7.7.0",
+    "npm": ">= 4.0.0"
   },
   "devDependencies": {
-    "eslint": "^3.19.0",
-    "eslint-config-probot": "^0.1.0"
+    "eslint-config-probot": ">=0.1.0",
+    "expect": "^1.20.2",
+    "localtunnel": "^1.8.2",
+    "mocha": "^3.2.0",
+    "xo": "^0.18.0"
   }
 }

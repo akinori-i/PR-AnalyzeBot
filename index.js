@@ -1,65 +1,58 @@
-//https://mikedeboer.github.io/node-github/#api-issues-get
-//https://developer.github.com/v3/issues/
-//https://developer.github.com/v3/pulls/
+
+const yaml = require('js-yaml');
+const visitor = require('probot-visitor');
 
 module.exports = robot => {
 
-
-    robot.on('issues.closed', async (event, context) => {
-        const params = context.issue({body: 'Issue was closed!'})
-
-        // Post a comment on the issue
-        return context.github.issues.createComment(params);
-    });
-
 /*
-    robot.on('issues.opened', async (event, context) => {
-        // `context` extracts information from the event, which can be passed to
-        // GitHub API calls. This will return:
-        //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
-        const label = context.issue({labels: ['bug']});
-        return context.github.issues.addLabels(label);
-    });
+            Issue
 */
 
-    robot.on('issue_comment.created', async (event, context) => {
-        let test = (await context.github.issues.getComments(context.issue({id: '308904398'}))).data;
-        console.log(test)
+    robot.on('issues.opened', issue_opened);
+    robot.on('issues.closed', issue_closed);
+    robot.on('issues.labeled', issue_labeled);
+    robot.on('issue_comment.created', issue_commentsCreate);
+
+    async function issue_opened (event, context) {
+        let issue = (await context.github.issues.get(context.issue())).data;
+        console.log(issue)  // show issuesEvent
+        //const title = context.issue({body: issue.title});
+        //const url = context.issue({body: issue.html_url});
+        //return context.github.issues.createComment(title);
+        //return context.github.issues.createComment(url);
+        const label = context.issue({labels: ['duplicate']});
+        return context.github.issues.addLabels(label);
+    }
+
+    async function issue_closed (event, context) {
+        const params = context.issue({body: 'Issue was closed!'})
+        return context.github.issues.createComment(params);
+    }
+
+    async function issue_labeled (event, context) {
+        const params = context.issue({body: 'Thank you for labeling!'})
+        return context.github.issues.createComment(params);
+    }
+    async function issue_commentsCreate (event, context) {
+        let comment = (await context.github.issues.getComments(context.issue())).data;
+        //console.log(comment)
+        //let issue = (await context.github.issues.get(context.issue())).data;
+        //console.log(comment.body);
         //const title = context.issues.get({body: issue.title});
         //return context.github.issues.createComment(title); 
-    });
+        const label = context.issue({labels: ['bug']});
+        return context.github.issues.addLabels(label);
+    }
 
+/*
+            Pull Request
+*/
 
+    robot.on('pull_request.opened', pullRequest_opened);
 
-    robot.on('issues.opened', async (event, context) => {
-        // `context` extracts information from the event, which can be passed to
-        // GitHub API calls. This will return:
-        //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
-        let issue = (await context.github.issues.get(context.issue())).data;
-        console.log(issue)
-        const title = context.issue({body: issue.title});
-        return context.github.issues.createComment(title);
-    });
-    
- 
-    robot.on('issues.labeled', async (event, context) => {
-        // `context` extracts information from the event, which can be passed to
-        // GitHub API calls. This will retx`urn:
-        //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
-        const params = context.issue({body: 'Nice label!'})
-        // Post a comment on the issue
-        return context.github.issues.createComment(params);
-    });
-
-
-
-    robot.on('pull_request.opened', async (event, context) => {
-        // `context` extracts information from the event, which can be passed to
-        // GitHub API calls. This will return:
-        //   {owner: 'yourname', repo: 'yourrepo', number: 123, body: 'Hello World!}
+    async function pullRequest_opened (event, context) {
         const params = context.issue({body: 'Thank you for your PR!'})
-
-        // Post a comment on the issue
         return context.github.issues.createComment(params);
-    });
+    }
+
 };
